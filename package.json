@@ -1,0 +1,37 @@
+{
+    "title": "WalaAlarm!",
+    "name": "wala-alarm-www",
+    "version": "0.0.1-alpha",
+    "description": "WalaBot & Alexa Integrated, Undefeatable Alarm Clock",
+    "license": "MIT",
+    "author": "Joshua Newell",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/imjosh/wala-alarm-www.git"
+    },
+    "dependencies": {
+        "bootstrap": "^4.0.0-beta.2",
+        "chart.js": "2.7.0",
+        "datatables.net-bs4": "1.10.16",
+        "eslint": "^4.14.0",
+        "font-awesome": "4.7.0",
+        "jquery": "^3.2.1",
+        "jquery.easing": "^1.4.1"
+    },
+    "devDependencies": {
+        "browser-sync": "2.18.13",
+        "express": "^4.16.2",
+        "gulp": "^3.9.1",
+        "gulp-clean-css": "3.9.0",
+        "gulp-header": "1.8.9",
+        "gulp-html-beautify": "^1.0.1",
+        "gulp-pug": "^3.3.0",
+        "gulp-rename": "^1.2.2",
+        "gulp-sass": "^3.1.0",
+        "gulp-uglify": "3.0.0"
+    },
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js"
+    }
+}
