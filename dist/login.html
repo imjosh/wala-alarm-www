@@ -22,6 +22,10 @@
       <div class="card-header">Login</div>
       <div class="card-body">
         <form id="signinForm">
+          <a href id="LoginWithAmazon">
+            <img border="0" alt="Login with Amazon" src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gold_156x32.png"
+              width="156" height="32" />
+          </a>
           <div class="form-group">
             <label for="emailInputSignin">Email address</label>
             <input class="form-control" id="emailInputSignin" type="email" aria-describedby="emailHelp" placeholder="Enter email">
@@ -50,11 +54,88 @@
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- Core plugin JavaScript-->
   <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.206.0.min.js"></script>
   <script src="vendor/amz/aws-cognito-sdk.min.js"></script>
   <script src="vendor/amz/amazon-cognito-identity.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/cognito-auth.js"></script>
+
+  <div id="amazon-root"></div>
+  <script type="text/javascript">
+    // load amazon-login-sdk
+    (function (d) {
+      var a = d.createElement('script'); a.type = 'text/javascript';
+      a.async = true; a.id = 'amazon-login-sdk';
+      a.src = 'https://api-cdn.amazon.com/sdk/login1.js';
+      d.getElementById('amazon-root').appendChild(a);
+    })(document);
+
+
+    window.onAmazonLoginReady = function () {
+      amazon.Login.setClientId('amzn1.application-oa2-client.32d0a7c5697144399f6f613196e86073');
+      const accessToken = getAccessToken();
+      if (accessToken) {
+        getUserProfile(accessToken);
+      }
+
+      document.getElementById('LoginWithAmazon').onclick = function () {
+        options = {
+          scope: 'profile',
+          popup: false,
+        };
+        amazon.Login.authorize(options,
+          'https://46aea472.ngrok.io/login.html'); // fixme 
+        return false;
+      };
+
+      function getAccessToken() {
+        let params = {};
+        if (window.location.hash) {
+          window.location.hash
+            .split('#')[1]
+            .split('&')
+            .forEach(function (elem) {
+              let s = elem.split('=');
+              params[s[0]] = s[1];
+            })
+        }
+        return params.access_token;
+      }
+
+      function getUserProfile(accessToken) {
+        accessToken = decodeURIComponent(accessToken);
+        // fixme debug
+        amazon.Login.retrieveProfile(accessToken, function (response) {
+          const p = response.profile;
+          console.log('name: ' + p.Name + ' | email: ' + p.PrimaryEmail + ' | id: ' + p.CustomerId);
+        });
+
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-east-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: 'us-east-1:6482fc27-6486-4dcc-8f65-d3aba59e3d70',
+          Logins: {
+            'www.amazon.com': accessToken
+          }
+        });
+
+        AWS.config.credentials.get(function (err) {
+          if (err) {
+            alert(err); // fixme debug
+            return;
+          }
+
+          // Credentials will be available when this function is called.
+          var accessKeyId = AWS.config.credentials.accessKeyId;
+          var secretAccessKey = AWS.config.credentials.secretAccessKey;
+          var sessionToken = AWS.config.credentials.sessionToken;
+
+          // now https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-with-identity-providers.html ?
+        });
+      }
+    };
+  </script>
+
 </body>
 
 </html>
